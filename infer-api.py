@@ -36,10 +36,10 @@ class MusicGenerationRequest(BaseModel):
     lyrics: Optional[str] = Field(None, description="Текст песни. Для инструментальной музыки можно использовать '[instrumental]'.")
     instrumental_only: bool = Field(True, description="Если True, генерирует инструментальную музыку, устанавливая lyrics в '[instrumental]' и игнорируя указанные lyrics.")
     audio_duration: float = 60.0
-    infer_step: int = 84
-    guidance_scale: float = 20.0
-    guidance_interval: float = 0.5
-    guidance_interval_decay: float = 0
+    infer_step: int = 155
+    guidance_scale: float = 25.0
+    guidance_interval: float = 0.75
+    guidance_interval_decay: float = 1.0
     min_guidance_scale: float = 3.0
     use_erg_tag: bool = True
     use_erg_lyric: bool = False
@@ -123,6 +123,10 @@ async def audio_player(filename: str):
     </html>
     """
     return HTMLResponse(content=html_content)
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8006)
