@@ -13,8 +13,8 @@ app = FastAPI(title="ACEStep Pipeline API", docs_url="/docs")
 # Монтируем директорию "outputs" для статических файлов
 app.mount("/static", StaticFiles(directory="outputs"), name="static")
 
-VN_URL: str = (
-    f"http://{str(os.getenv('VN_URL'))}"
+Music_URL: str = (
+    f"http://{str(os.getenv('Music_URL'))}"
     if os.getenv is not None
     else "http://localhost:8006"
 )
@@ -101,7 +101,7 @@ async def generate_music(request: MusicGenerationRequest):
         omega_scale=request.omega_scale,
     )
     filename = os.path.basename(audio_path)
-    audio_url = f"{VN_URL}/static/{filename}"
+    audio_url = f"{Music_URL}/static/{filename}"
     return {
         "message": "Музыка успешно сгенерирована",
         "audio_url": audio_url,
