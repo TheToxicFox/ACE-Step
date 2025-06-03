@@ -94,11 +94,11 @@ REPO_ID_QUANT = REPO_ID + "-q4-K-M" # ??? update this i guess
 class ACEStepPipeline:
     def __init__(
         self,
-        checkpoint_dir=None,
+        checkpoint_dir=".cache/ace-step/checkpoints",
         device_id=0,
         dtype="bfloat16",
         text_encoder_checkpoint_path=None,
-        persistent_storage_path=None,
+        persistent_storage_path=".cache/ace-step/checkpoints",
         torch_compile=False,
         cpu_offload=False,
         quantized=False,
@@ -155,7 +155,7 @@ class ACEStepPipeline:
         gc.collect()
 
     def get_checkpoint_path(self, checkpoint_dir, repo):
-        checkpoint_dir_models = None
+        checkpoint_dir_models = ".cache/ace-step/checkpoints"
         
         if checkpoint_dir is not None:
             required_dirs = ["music_dcae_f8c8", "music_vocoder", "ace_step_transformer", "umt5-base"]
