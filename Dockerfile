@@ -26,6 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+ENV VN_URL=http://127.0.0.1:8006
+
 # Set working directory
 WORKDIR /app
 
