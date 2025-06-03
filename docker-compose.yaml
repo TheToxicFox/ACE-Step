@@ -8,7 +8,7 @@ services:
     hostname: *name
     stop_grace_period: 2s
     ports:
-      - "7865:7865"
+      - "8006:8006"
     volumes:
       - ./checkpoints:/app/checkpoints
       - ./outputs:/app/outputs
