@@ -13,6 +13,12 @@ app = FastAPI(title="ACEStep Pipeline API", docs_url="/docs")
 # Монтируем директорию "outputs" для статических файлов
 app.mount("/static", StaticFiles(directory="outputs"), name="static")
 
+VN_URL: str = (
+    f"http://{str(os.getenv('VN_URL'))}"
+    if os.getenv is not None
+    else "http://localhost:8006"
+)
+
 # Определение пресетов жанров
 GENRE_PRESETS = {
     "Modern Pop": "pop, synth, drums, guitar, 120 bpm, upbeat, catchy, vibrant",
@@ -34,16 +40,16 @@ class MusicGenerationRequest(BaseModel):
     prompt: Optional[str] = Field(None, description="Промпт для генерации музыки. Игнорируется, если указан genre_preset.")
     genre_preset: Optional[str] = Field(None, description=f"Пресет жанра. Доступные пресеты: {', '.join(GENRE_PRESETS.keys())}")
     lyrics: Optional[str] = Field(None, description="Текст песни. Для инструментальной музыки можно использовать '[instrumental]'.")
-    instrumental_only: bool = Field(True, description="Если True, генерирует инструментальную музыку, устанавливая lyrics в '[instrumental]' и игнорируя указанные lyrics.")
+    instrumental_only: bool = Field(False, description="Если True, генерирует инструментальную музыку, устанавливая lyrics в '[instrumental]' и игнорируя указанные lyrics.")
     audio_duration: float = 60.0
-    infer_step: int = 155
-    guidance_scale: float = 25.0
-    guidance_interval: float = 0.75
+    infer_step: int = 60
+    guidance_scale: float = 15.0
+    guidance_interval: float = 0.5
     guidance_interval_decay: float = 1.0
     min_guidance_scale: float = 3.0
-    use_erg_tag: bool = True
+    use_erg_tag: bool = False
     use_erg_lyric: bool = False
-    use_erg_diffusion: bool = True
+    use_erg_diffusion: bool = False
     cfg_type: str = "apg"
     scheduler_type: str = "euler"
     omega_scale: float = 10.0
@@ -95,35 +101,15 @@ async def generate_music(request: MusicGenerationRequest):
         omega_scale=request.omega_scale,
     )
     filename = os.path.basename(audio_path)
-    audio_url = f"/static/{filename}"
-    player_url = f"/audio_player/{filename}"
+    audio_url = f"{VN_URL}/static/{filename}"
     return {
         "message": "Музыка успешно сгенерирована",
         "audio_url": audio_url,
-        "player_url": player_url
     }
-
-@app.get("/audio_player/{filename}", response_class=HTMLResponse)
-async def audio_player(filename: str):
-    audio_url = f"/static/{filename}"
-    html_content = f"""
-    <!DOCTYPE html>
-    <html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <title>Аудиоплеер</title>
-    </head>
-    <body>
-        <h1>Аудиоплеер</h1>
-        <audio controls>
-            <source src="{audio_url}" type="audio/{filename.split('.')[-1]}">
-            Ваш браузер не поддерживает элемент audio.
-        </audio>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
-
+@app.get("/genres", description="Retrieve the list of available genre names")
+async def get_genres():
+    return list(GENRE_PRESETS.keys())
+  
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
