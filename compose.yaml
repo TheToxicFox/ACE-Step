@@ -1,0 +1,8 @@
+services:
+  music:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8006:8006"
+    gpus: all
